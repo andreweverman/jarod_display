@@ -1,2 +1,2 @@
-cd rpi
+cd rpi/bindings/python
 make

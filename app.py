@@ -3,7 +3,7 @@ from hmac import new
 from types import new_class
 import urllib3
 # from RGBMatrixEmulator import graphics
-from rpi.rgbmatrix import graphics
+from rpi.bindings.python.rgbmatrix import graphics
 from samplebase import SampleBase
 from random import Random
 import time
