@@ -6,7 +6,6 @@ import os
 from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
 # from rgbmatrix import RGBMatrix, RGBMatrixOptions
 
-
 class SampleBase(object):
     def __init__(self, *args, **kwargs):
         self.parser = argparse.ArgumentParser()

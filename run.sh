@@ -1,0 +1,1 @@
+sudo python app.py --led-no-hardware-pulse=true --led-cols=64 -m adafruit-hat
