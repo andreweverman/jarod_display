@@ -4,8 +4,9 @@ import sys
 import os
 
 # from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
-sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/..'))
-print(os.path.abspath(os.path.dirname(__file__) + '/..'))
+p = os.path.abspath(os.path.dirname(__file__) + 'rpi/bindings/python/..')
+print(p)
+sys.path.append(p)
 from rpi.bindings.python.rgbmatrix import RGBMatrix, RGBMatrixOptions
 
 class SampleBase(object):
