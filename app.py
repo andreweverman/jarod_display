@@ -156,7 +156,7 @@ class CavernCrawler(SampleBase):
     def run(self):
         offscreen_canvas = self.matrix.CreateFrameCanvas()
         font = graphics.Font()
-        font.LoadFont("./fonts/6x10.bdf")
+        font.LoadFont("./rpi-rgb-led-matric/fonts/6x10.bdf")
         textColor = graphics.Color(255, 255, 0)
         numColor = graphics.Color(0, 128, 0)
         pos = offscreen_canvas.width
