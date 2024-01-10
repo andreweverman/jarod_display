@@ -9,7 +9,14 @@ from random import Random
 import time
 import math
 import json
+import numpy as np
+import time
+import board
+import adafruit_tsl2591
 
+
+i2c = board.I2C()
+sensor = adafruit_tsl2591.TSL2591(i2c)
 
 ROBLOX_URL = "https://games.roblox.com/v1/games?universeIds=4674537620"
 http = urllib3.PoolManager()
@@ -21,7 +28,38 @@ PLAYER = (211,211,211)
 ACTIVE = 'active'
 VISITS = 'visits'
 
+MAX_BRIGHTNESS = 2001880
+NIGHT_LIGHT = 20000
+
+
 class CavernCrawler(SampleBase):
+
+    def smooth_light_data(self):
+        l = self.array
+        if np.any(l):
+            print(l)
+            smoothed = l[(l > np.quantile(l, 0.05)) & (l < np.quantile(l, 0.95))].tolist()
+            return np.mean(smoothed)
+        return MAX_BRIGHTNESS
+
+    def initialize_light_array(self, size):
+        self.array = np.zeros((int(size),))
+
+    def add_light_reading_to_array(self, num):
+        self.array[num] = self.get_light_reading()
+
+    def get_brightness(self):
+        brightness = self.smooth_light_data()
+        return brightness / MAX_BRIGHTNESS * 100
+
+
+    def get_light_reading(self):
+        try:
+            i = sensor.visible
+#            print('Visible: ' + str(i))
+            return i
+        except: 
+            pass
 
 
     def load_config(self):
@@ -176,6 +214,10 @@ class CavernCrawler(SampleBase):
         animation_frame_count = 0
         refresh_count_needed = refresh_seconds / refresh_interval
         frame_count = 0
+        light_count = 0
+        light_capture_time = 3
+        light_count_needed = light_capture_time / refresh_interval
+        self.initialize_light_array(light_count_needed)
         while True:
             offscreen_canvas.Clear()
             for piece in pieces:
@@ -197,14 +239,22 @@ class CavernCrawler(SampleBase):
             str_offfset = len(active_str) * 6
             x_pos = self.matrix.width - margin - str_offfset
             graphics.DrawText(offscreen_canvas, font, x_pos, 25, numColor,active_str )
+            if light_count < light_count_needed:
+                self.add_light_reading_to_array(light_count)
 
             time.sleep(refresh_interval)
             # refreshing the data
             if frame_count> refresh_count_needed:
                 frame_count = 0
                 self.get_count()
+            if light_count > light_count_needed:
+                light_count = 0
+                brightness = self.get_brightness()
+                print(brightness)
+                self.initialize_light_array(light_count_needed)
             offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
             frame_count += 1
+            light_count += 1
       
 
 
