@@ -1,10 +1,12 @@
+from ctypes.wintypes import RGB
+import random
 import arrow
 from hmac import new
 from types import new_class
 import urllib3
 from samplebase import SampleBase
-# from RGBMatrixEmulator import graphics
-from rpi.bindings.python.rgbmatrix import graphics
+# from RGBMatrixEmulator import graphics, RGBMatrix
+from rpi.bindings.python.rgbmatrix import graphics, RGBMatrix
 from random import Random
 import time
 import math
@@ -28,7 +30,11 @@ PLAYER = (211,211,211)
 ACTIVE = 'active'
 VISITS = 'visits'
 
-MAX_BRIGHTNESS = 2001880
+REFRESH_SECONDS = 15
+ANIMATION_TIME = 3
+LIGHT_CAPTURE_TIME = 10
+
+MAX_BRIGHTNESS = 2000000
 NIGHT_LIGHT = 20000
 
 
@@ -39,7 +45,9 @@ class CavernCrawler(SampleBase):
         if np.any(l):
             print(l)
             smoothed = l[(l > np.quantile(l, 0.05)) & (l < np.quantile(l, 0.95))].tolist()
-            return np.mean(smoothed)
+            if np.any(smoothed):
+                return np.mean(smoothed)
+            return np.mean(l)
         return MAX_BRIGHTNESS
 
     def initialize_light_array(self, size):
@@ -50,12 +58,16 @@ class CavernCrawler(SampleBase):
 
     def get_brightness(self):
         brightness = self.smooth_light_data()
-        return brightness / MAX_BRIGHTNESS * 100
+        if brightness < NIGHT_LIGHT:
+            return 10
+        else:   
+            return min(max(30,brightness / MAX_BRIGHTNESS * 100),100)
 
 
     def get_light_reading(self):
         try:
             i = sensor.visible
+            # i = MAX_BRIGHTNESS * random.random()
 #            print('Visible: ' + str(i))
             return i
         except: 
@@ -183,13 +195,13 @@ class CavernCrawler(SampleBase):
 
     def __init__(self, *args, **kwargs):
         super(CavernCrawler, self).__init__(*args, **kwargs)
+        self.array = self.initialize_light_array(0)
         self.load_config()
         self.p_num_players = 0
         self.num_players = 0
         self.get_count()
         self.animating = True
         self.frame = True
-
 
     def run(self):
         offscreen_canvas = self.matrix.CreateFrameCanvas()
@@ -208,18 +220,17 @@ class CavernCrawler(SampleBase):
 
         margin = 10
         refresh_interval = .2
-        refresh_seconds = 15
-        animation_time = 3
-        animation_frames_needed = animation_time / refresh_interval
+        animation_frames_needed = ANIMATION_TIME / refresh_interval
         animation_frame_count = 0
-        refresh_count_needed = refresh_seconds / refresh_interval
+        refresh_count_needed = REFRESH_SECONDS / refresh_interval
         frame_count = 0
         light_count = 0
-        light_capture_time = 3
-        light_count_needed = light_capture_time / refresh_interval
+        light_count_needed = LIGHT_CAPTURE_TIME / refresh_interval
         self.initialize_light_array(light_count_needed)
+        brightness = 0
         while True:
             offscreen_canvas.Clear()
+            # set brightness to 10
             for piece in pieces:
                 graphics.DrawText(offscreen_canvas, font, piece.get('x'), piece.get('y'), textColor, piece.get('text'))
 
@@ -239,8 +250,6 @@ class CavernCrawler(SampleBase):
             str_offfset = len(active_str) * 6
             x_pos = self.matrix.width - margin - str_offfset
             graphics.DrawText(offscreen_canvas, font, x_pos, 25, numColor,active_str )
-            if light_count < light_count_needed:
-                self.add_light_reading_to_array(light_count)
 
             time.sleep(refresh_interval)
             # refreshing the data
@@ -250,9 +259,13 @@ class CavernCrawler(SampleBase):
             if light_count > light_count_needed:
                 light_count = 0
                 brightness = self.get_brightness()
+                self.options.brightness = brightness
+                self.matrix = RGBMatrix(options = self.options)
                 print(brightness)
                 self.initialize_light_array(light_count_needed)
             offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
+            if light_count < light_count_needed:
+                self.add_light_reading_to_array(light_count)
             frame_count += 1
             light_count += 1
       
