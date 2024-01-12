@@ -37,7 +37,7 @@ REFRESH_SECONDS = 15
 ANIMATION_TIME = 3
 LIGHT_CAPTURE_TIME = 10
 
-MAX_BRIGHTNESS = 2000000
+MAX_SENSOR_BRIGHTNESS = 2000000
 NIGHT_LIGHT = 20000
 
 MAX_DISPLAY_BRIGHTNESS = 75
@@ -53,7 +53,7 @@ class CavernCrawler(SampleBase):
             if np.any(smoothed):
                 return np.mean(smoothed)
             return np.mean(l)
-        return MAX_BRIGHTNESS
+        return MAX_SENSOR_BRIGHTNESS
 
     def initialize_light_array(self, size):
         self.array = np.zeros((int(size),))
@@ -63,10 +63,13 @@ class CavernCrawler(SampleBase):
 
     def get_brightness(self):
         brightness = self.smooth_light_data()
+        calculated_brightness = brightness / MAX_SENSOR_BRIGHTNESS * MAX_DISPLAY_BRIGHTNESS
+        print("Brightness: " + str(brightness))
+        print("Brightness Percent: " + str(brightness))
         if brightness < NIGHT_LIGHT:
             return 10
         else:   
-            return min(max(30,brightness / MAX_BRIGHTNESS * MAX_DISPLAY_BRIGHTNESS),MAX_DISPLAY_BRIGHTNESS)
+            return min(max(30,calculated_brightness),MAX_DISPLAY_BRIGHTNESS)
 
 
     def get_light_reading(self):
@@ -74,7 +77,7 @@ class CavernCrawler(SampleBase):
             if sensor: 
                 i = sensor.visible
             else:
-                i = MAX_BRIGHTNESS 
+                i = MAX_SENSOR_BRIGHTNESS 
 #            print('Visible: ' + str(i))
             return i
         except: 
@@ -234,7 +237,7 @@ class CavernCrawler(SampleBase):
         light_count = 0
         light_count_needed = LIGHT_CAPTURE_TIME / refresh_interval
         self.initialize_light_array(light_count_needed)
-        brightness = 50
+        brightness = MAX_DISPLAY_BRIGHTNESS
         while True:
             offscreen_canvas.Clear()
             self.matrix.brightness = brightness
