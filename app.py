@@ -5,8 +5,8 @@ from hmac import new
 from types import new_class
 import urllib3
 from samplebase import SampleBase
-from RGBMatrixEmulator import graphics
-# from rpi.bindings.python.rgbmatrix import graphics, RGBMatrix
+# from RGBMatrixEmulator import graphics
+from rpi.bindings.python.rgbmatrix import graphics 
 import time
 import json
 import numpy as np
