@@ -45,7 +45,7 @@ LIGHT_CAPTURE_TIME = 10
 MAX_SENSOR_BRIGHTNESS = 2000000
 NIGHT_LIGHT = 20000
 
-MAX_DISPLAY_BRIGHTNESS = 75
+MAX_DISPLAY_BRIGHTNESS = 20
 
 
 class CavernCrawler(SampleBase):
@@ -275,7 +275,7 @@ class CavernCrawler(SampleBase):
 
 
         margin = 10
-        refresh_interval = .2
+        refresh_interval = 1
         animation_frames_needed = ANIMATION_TIME / refresh_interval
         animation_frame_count = 0
         refresh_count_needed = REFRESH_SECONDS / refresh_interval
