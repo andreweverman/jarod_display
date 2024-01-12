@@ -16,6 +16,8 @@ import time
 import board
 import adafruit_tsl2591
 
+i2c = None
+sensor = None
 
 try:
     i2c = board.I2C()
