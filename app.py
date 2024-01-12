@@ -67,7 +67,7 @@ class CavernCrawler(SampleBase):
         brightness = self.smooth_light_data()
         calculated_brightness = brightness / MAX_SENSOR_BRIGHTNESS * MAX_DISPLAY_BRIGHTNESS
         print("Brightness: " + str(brightness))
-        print("Brightness Percent: " + str(brightness))
+        print("Brightness Percent: " + str(calculated_brightness))
         if brightness < NIGHT_LIGHT:
             return 10
         else:   
