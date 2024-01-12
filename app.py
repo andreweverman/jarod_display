@@ -17,8 +17,11 @@ import board
 import adafruit_tsl2591
 
 
-i2c = board.I2C()
-sensor = adafruit_tsl2591.TSL2591(i2c)
+try:
+    i2c = board.I2C()
+    sensor = adafruit_tsl2591.TSL2591(i2c)
+except Exception as e:
+    print(e)
 
 ROBLOX_URL = "https://games.roblox.com/v1/games?universeIds=4674537620"
 http = urllib3.PoolManager()
@@ -264,9 +267,6 @@ class CavernCrawler(SampleBase):
             if light_count > light_count_needed:
                 light_count = 0
                 brightness = self.get_brightness()
-                self.options.brightness = int(brightness)
-                self.matrix = RGBMatrix(options = self.options)
-                print(brightness)
                 self.initialize_light_array(light_count_needed)
             offscreen_canvas = self.matrix.SwapOnVSync(offscreen_canvas)
             if light_count < light_count_needed:
