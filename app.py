@@ -37,6 +37,8 @@ LIGHT_CAPTURE_TIME = 10
 MAX_BRIGHTNESS = 2000000
 NIGHT_LIGHT = 20000
 
+MAX_DISPLAY_BRIGHTNESS = 75
+
 
 class CavernCrawler(SampleBase):
 
@@ -61,13 +63,15 @@ class CavernCrawler(SampleBase):
         if brightness < NIGHT_LIGHT:
             return 10
         else:   
-            return min(max(30,brightness / MAX_BRIGHTNESS * 100),100)
+            return min(max(30,brightness / MAX_BRIGHTNESS * MAX_DISPLAY_BRIGHTNESS),MAX_DISPLAY_BRIGHTNESS)
 
 
     def get_light_reading(self):
         try:
-            i = sensor.visible
-            # i = MAX_BRIGHTNESS * random.random()
+            if sensor: 
+                i = sensor.visible
+            else:
+                i = MAX_BRIGHTNESS 
 #            print('Visible: ' + str(i))
             return i
         except: 
@@ -227,9 +231,10 @@ class CavernCrawler(SampleBase):
         light_count = 0
         light_count_needed = LIGHT_CAPTURE_TIME / refresh_interval
         self.initialize_light_array(light_count_needed)
-        brightness = 0
+        brightness = 50
         while True:
             offscreen_canvas.Clear()
+            self.matrix.brightness = brightness
             # set brightness to 10
             for piece in pieces:
                 graphics.DrawText(offscreen_canvas, font, piece.get('x'), piece.get('y'), textColor, piece.get('text'))
@@ -259,7 +264,7 @@ class CavernCrawler(SampleBase):
             if light_count > light_count_needed:
                 light_count = 0
                 brightness = self.get_brightness()
-                self.options.brightness = brightness
+                self.options.brightness = int(brightness)
                 self.matrix = RGBMatrix(options = self.options)
                 print(brightness)
                 self.initialize_light_array(light_count_needed)
