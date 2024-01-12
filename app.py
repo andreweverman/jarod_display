@@ -199,7 +199,7 @@ class CavernCrawler(SampleBase):
             elif self.count_type == VISITS:
                 num_players = self.get_visits(response)
         except Exception:
-            pass
+            return num_players
         if num_players > self.num_players:
             self.animating = True
         self.num_players = num_players
