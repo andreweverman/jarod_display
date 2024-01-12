@@ -73,16 +73,14 @@ class CavernCrawler(SampleBase):
 
 
     def get_light_reading(self):
+        i =  MAX_SENSOR_BRIGHTNESS
         try:
             if sensor: 
                 i = sensor.visible
-            else:
-                i = MAX_SENSOR_BRIGHTNESS 
-#            print('Visible: ' + str(i))
-            return i
-        except: 
-            pass
+        except Exception as e: 
+            print(e)
 
+        return i
 
     def load_config(self):
         with open('config.json') as json_file:
