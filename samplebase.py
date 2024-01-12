@@ -3,11 +3,11 @@ import time
 import sys
 import os
 
-# from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
+from RGBMatrixEmulator import RGBMatrix, RGBMatrixOptions
 p = os.path.abspath(os.path.dirname(__file__) + '/rpi/bindings/python')
 print(p)
 sys.path.append(p)
-from rpi.bindings.python.rgbmatrix import RGBMatrix, RGBMatrixOptions
+# from rpi.bindings.python.rgbmatrix import RGBMatrix, RGBMatrixOptions
 
 class SampleBase(object):
     def __init__(self, *args, **kwargs):

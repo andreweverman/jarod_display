@@ -5,11 +5,9 @@ from hmac import new
 from types import new_class
 import urllib3
 from samplebase import SampleBase
-# from RGBMatrixEmulator import graphics, RGBMatrix
-from rpi.bindings.python.rgbmatrix import graphics, RGBMatrix
-from random import Random
+from RGBMatrixEmulator import graphics
+# from rpi.bindings.python.rgbmatrix import graphics, RGBMatrix
 import time
-import math
 import json
 import numpy as np
 import time
@@ -73,8 +71,10 @@ class CavernCrawler(SampleBase):
         logger.debug("Brightness: " + str(brightness))
         logger.debug("Brightness Percent: " + str(calculated_brightness))
         if brightness < NIGHT_LIGHT:
+            self.moon = True
             return 10
         else:   
+            # self.moon = False
             return min(max(30,calculated_brightness),MAX_DISPLAY_BRIGHTNESS)
 
 
@@ -95,6 +95,47 @@ class CavernCrawler(SampleBase):
             if self.count_type not in [ACTIVE, VISITS]:
                 self.count_type = ACTIVE
             
+    def get_moon_pixels(self, x, y):
+        moon = [
+        { 'x': x, 'y': y, 'part':'bg'},
+        { 'x': x, 'y': y+1, 'part':'bg'},
+        { 'x': x, 'y': y+2, 'part':'bg'},
+        { 'x': x, 'y': y+3, 'part':'fg'},
+        { 'x': x, 'y': y+4, 'part':'bg'},
+        { 'x': x, 'y': y+5, 'part':'bg'},
+        { 'x': x-1, 'y': y, 'part':'bg'},
+        { 'x': x-1, 'y': y+1, 'part':'bg'},
+        { 'x': x-1, 'y': y+2, 'part':'bg'},
+        { 'x': x-1, 'y': y+3, 'part':'bg'},
+        { 'x': x-1, 'y': y+4, 'part':'bg'},
+        { 'x': x-2, 'y': y, 'part':'bg'},
+        { 'x': x-2, 'y': y+1, 'part':'fg'},
+        { 'x': x-2, 'y': y+2, 'part':'bg'},
+        { 'x': x-2, 'y': y+3, 'part':'bg'},
+        { 'x': x-2, 'y': y+4, 'part':'bg'},
+        { 'x': x-3, 'y': y, 'part':'bg'},
+        { 'x': x-3, 'y': y+1, 'part':'bg'},
+        { 'x': x-3, 'y': y+2, 'part':'bg'},
+        { 'x': x-3, 'y': y+3, 'part':'bg'},
+        { 'x': x-4, 'y': y, 'part':'bg'},
+        { 'x': x-4, 'y': y+1, 'part':'bg'},
+        { 'x': x-4, 'y': y+2, 'part':'bg'},
+        { 'x': x-5, 'y': y, 'part':'bg'},
+        { 'x': x-5, 'y': y+1, 'part':'bg'},
+          ]
+
+        for pixel in moon:
+            if pixel.get('part') == 'bg':
+                pixel['r'] = 119
+                pixel['g'] = 146
+                pixel['b'] = 153 
+            elif pixel.get('part') == 'fg':
+                pixel['r'] = 32
+                pixel['g'] = 32
+                pixel['b'] = 32 
+
+        return moon
+
 
     def get_miner_pixels(self,x, y, percent_done):
         if percent_done < .3 or percent_done > .7:
@@ -200,7 +241,7 @@ class CavernCrawler(SampleBase):
                 num_players = self.get_visits(response)
         except Exception:
             return num_players
-        if num_players > self.num_players:
+        if isinstance(num_players, str) or isinstance(num_players, int) and num_players > self.num_players:
             self.animating = True
         self.num_players = num_players
         return num_players
@@ -216,6 +257,7 @@ class CavernCrawler(SampleBase):
         self.get_count()
         self.animating = True
         self.frame = True
+        self.moon = True
 
     def run(self):
         offscreen_canvas = self.matrix.CreateFrameCanvas()
@@ -251,6 +293,9 @@ class CavernCrawler(SampleBase):
 
           
             active_str = (format (self.num_players, ',d'))
+            if self.moon:
+                for pixel in self.get_moon_pixels(63,0):
+                    offscreen_canvas.SetPixel(pixel.get('x'),pixel.get('y'),pixel.get('r', 255),pixel.get('g', 255),pixel.get('b', 0))
             if self.animating:
                 animation_percent = animation_frame_count/ animation_frames_needed 
                 for pixel in self.get_miner_pixels(64-6,17,animation_percent):
