@@ -15,6 +15,11 @@ import numpy as np
 import time
 import board
 import adafruit_tsl2591
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
+
 
 i2c = None
 sensor = None
@@ -23,7 +28,7 @@ try:
     i2c = board.I2C()
     sensor = adafruit_tsl2591.TSL2591(i2c)
 except Exception as e:
-    print(e)
+    logger.error(e)
 
 ROBLOX_URL = "https://games.roblox.com/v1/games?universeIds=4674537620"
 http = urllib3.PoolManager()
@@ -50,7 +55,6 @@ class CavernCrawler(SampleBase):
     def smooth_light_data(self):
         l = self.array
         if np.any(l):
-            print(l)
             smoothed = l[(l > np.quantile(l, 0.05)) & (l < np.quantile(l, 0.95))].tolist()
             if np.any(smoothed):
                 return np.mean(smoothed)
@@ -66,8 +70,8 @@ class CavernCrawler(SampleBase):
     def get_brightness(self):
         brightness = self.smooth_light_data()
         calculated_brightness = brightness / MAX_SENSOR_BRIGHTNESS * MAX_DISPLAY_BRIGHTNESS
-        print("Brightness: " + str(brightness))
-        print("Brightness Percent: " + str(calculated_brightness))
+        logger.debug("Brightness: " + str(brightness))
+        logger.debug("Brightness Percent: " + str(calculated_brightness))
         if brightness < NIGHT_LIGHT:
             return 10
         else:   
