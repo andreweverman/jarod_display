@@ -190,9 +190,9 @@ class CavernCrawler(SampleBase):
     def get_count(self):
 
         self.p_num_players = self.num_players
-        response = http.request('GET', ROBLOX_URL)
         num_players = '?'
         try:
+            response = http.request('GET', ROBLOX_URL)
             # num_players = self.p_num_players + 1
             if self.count_type == ACTIVE:
                 num_players = self.get_active_players(response)
