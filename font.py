@@ -1,5 +1,5 @@
-import bdfparser
 
+import bdfparser
 
 class Font:
     def __init__(self):

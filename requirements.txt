@@ -1,5 +1,6 @@
 adafruit-circuitpython-tsl2591==1.3.12
 arrow==0.4.4
-bdfparser==2.2.0 
+# because I can't use pip on jarods pi
+# bdfparser==2.2.0 
 numpy==1.26.3
 urllib3==2.1.0

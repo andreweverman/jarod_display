@@ -1,12 +1,10 @@
 from cgitb import text
 from ctypes.wintypes import RGB
-import random
-import arrow
 from hmac import new
 from types import new_class
 import urllib3
 from samplebase import SampleBase
-from RGBMatrixEmulator import graphics
+# from RGBMatrixEmulator import graphics
 from font import Font
 from rpi.bindings.python.rgbmatrix import graphics
 import time
