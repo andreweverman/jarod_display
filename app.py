@@ -180,7 +180,6 @@ class ScoreboardGame(SampleBase):
             return num_players
         if isinstance(num_players, str) or isinstance(num_players, int) and num_players > self.num_players:
             self.animating = True
-        self.animating = True
         self.num_players = num_players
         return num_players
 
